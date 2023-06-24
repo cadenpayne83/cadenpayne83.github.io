@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <title>Chore Chart</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  </head>
+  <body>
+    <py-config>
+    packages = ["PrettyTable"]
+    </py-config>
+    
+    <py-script>
+      from prettytable import PrettyTable
+      class Chore:
+          completed = False
+      
+          def __init__(self, name, description, due_date):
+              self.name = name
+              self.description = description
+              self.due_date = due_date
+      
+          def __repr__(self):
+              return f"{self.name}: {self.description}"
+      
+      class Person:
+          # an instance of a chore chart must exist before creating a person
+          
+          def __init__(self, name, assigned_chore=[]):
+              self.name = name
+              self.assigned_chore = assigned_chore
+      
+      class ChoreChart:
+          chart_gui = []
+          
+          def __init__(self, chore_list=[], people=[], table=None):
+              self.chore_list = chore_list # this is a list of Chore instances
+              self.people = people
+              self.table = table
+      
+          def add_person(self, person):
+              #adds person to chore chart
+              self.people.append(person)
+              return self.people
+          
+          def add_chore(self, chore):
+              self.chore_list.append(chore)
+              return self.chore_list
+          
+          def remove_chore(self, chore):
+              self.chore_list.remove(chore)
+              return self.chore_list
+          
+          def assign_one_chore(self, person, chore):
+              person.assigned_chore.append(chore)
+      
+          def create_table(self):
+              self.table = PrettyTable()
+              self.table.field_names = ["Person", "Chore", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"]
+              for person in self.people:
+                  self.table.add_row([person.name, person.assigned_chore.name, " ", " ", " ", " ", " ", " ", " "])
+              
+      #------------------creating the chore chart and the chores---------------------#    
+      chore_chart = ChoreChart()
+      mop_floor = Chore("Mop the floor", "Mop the kitchen floor using the bucket and mop found outside", "Fri")
+      dust_room = Chore("Dust family room", "Dust the entire family room making sure all surfaces are dusted", "Mon")
+      clean_bathroom = Chore("Clean the bathroom", "Clean the toilet, sink, and bathtub", "Sun")
+      dust_living_room = Chore("Dust the living room", "Dust all surfaces in the living room", "Tue")
+      dust_family_room = Chore("Dust the family room", "Dust all surfaces in the family room", "Thur")
+      gather_trash = Chore("Gather trash", "Gather all trash within the house (kitchen, bathrooms, bedrooms)", "Wed")
+      #------------------------------------------------------------------------------#
+      
+      
+      
+      #------------------------creating people instances-----------------------------#
+      caden = Person("Caden", dust_room)
+      curtis = Person("Curtis", clean_bathroom)
+      lydia = Person("Lydia", mop_floor)
+      mark = Person("Mark", dust_family_room)
+      mike = Person("Mike", dust_living_room)
+      tyler = Person("Tyler", clean_bathroom)
+      #------------------------------------------------------------------------------#
+      
+      
+      
+      #-------------adding people to chore chart and creating the table--------------#
+      chore_chart.add_person(caden)
+      chore_chart.add_person(curtis)
+      chore_chart.add_person(lydia)
+      chore_chart.add_person(mark)
+      chore_chart.add_person(mike)
+      chore_chart.add_person(tyler)
+      chore_chart.create_table()
+      
+      #---------------------------password-------------------------------------------#
+      print(chore_chart.table)
+      #----------------------------------------------------------------------#
+    </py-script>
+
+  </body>
+</html>
