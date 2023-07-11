@@ -11,90 +11,197 @@
     </py-config>
     
     <py-script>
-      from prettytable import PrettyTable
-      class Chore:
-          completed = False
-      
-          def __init__(self, name, description, due_date):
-              self.name = name
-              self.description = description
-              self.due_date = due_date
-      
-          def __repr__(self):
-              return f"{self.name}: {self.description}"
-      
-      class Person:
-          # an instance of a chore chart must exist before creating a person
-          
-          def __init__(self, name, assigned_chore=[]):
-              self.name = name
-              self.assigned_chore = assigned_chore
-      
-      class ChoreChart:
-          chart_gui = []
-          
-          def __init__(self, chore_list=[], people=[], table=None):
-              self.chore_list = chore_list # this is a list of Chore instances
-              self.people = people
-              self.table = table
-      
-          def add_person(self, person):
-              #adds person to chore chart
-              self.people.append(person)
-              return self.people
-          
-          def add_chore(self, chore):
-              self.chore_list.append(chore)
-              return self.chore_list
-          
-          def remove_chore(self, chore):
-              self.chore_list.remove(chore)
-              return self.chore_list
-          
-          def assign_one_chore(self, person, chore):
-              person.assigned_chore.append(chore)
-      
-          def create_table(self):
-              self.table = PrettyTable()
-              self.table.field_names = ["Person", "Chore", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"]
-              for person in self.people:
-                  self.table.add_row([person.name, person.assigned_chore.name, " ", " ", " ", " ", " ", " ", " "])
-              
-      #------------------creating the chore chart and the chores---------------------#    
-      chore_chart = ChoreChart()
-      mop_floor = Chore("Mop the floor", "Mop the kitchen floor using the bucket and mop found outside", "Fri")
-      dust_room = Chore("Dust family room", "Dust the entire family room making sure all surfaces are dusted", "Mon")
-      clean_bathroom = Chore("Clean the bathroom", "Clean the toilet, sink, and bathtub", "Sun")
-      dust_living_room = Chore("Dust the living room", "Dust all surfaces in the living room", "Tue")
-      dust_family_room = Chore("Dust the family room", "Dust all surfaces in the family room", "Thur")
-      gather_trash = Chore("Gather trash", "Gather all trash within the house (kitchen, bathrooms, bedrooms)", "Wed")
-      #------------------------------------------------------------------------------#
-      
-      
-      
-      #------------------------creating people instances-----------------------------#
-      caden = Person("Caden", dust_room)
-      curtis = Person("Curtis", clean_bathroom)
-      lydia = Person("Lydia", mop_floor)
-      mark = Person("Mark", dust_family_room)
-      mike = Person("Mike", dust_living_room)
-      tyler = Person("Tyler", clean_bathroom)
-      #------------------------------------------------------------------------------#
-      
-      
-      
-      #-------------adding people to chore chart and creating the table--------------#
-      chore_chart.add_person(caden)
-      chore_chart.add_person(curtis)
-      chore_chart.add_person(lydia)
-      chore_chart.add_person(mark)
-      chore_chart.add_person(mike)
-      chore_chart.add_person(tyler)
-      chore_chart.create_table()
-      
-      #---------------------------password-------------------------------------------#
-      print(chore_chart.table)
-      #----------------------------------------------------------------------#
+        from prettytable import PrettyTable
+        import calendar
+        import datetime
+        
+        def get_all_weeks_in_year(year):
+            weeks = []
+            # Iterate over each month of the year
+            for month in range(1, 13):
+                # Get the month's calendar
+                month_calendar = calendar.monthcalendar(year, month)
+                
+                # Iterate over each week in the month
+                for week in month_calendar:
+                    # Add the week to the list
+                    if week not in weeks:
+                        weeks.append(week)
+        
+            
+            return weeks #form of [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+        
+        
+        def get_week_number(year, month, day):
+            date = datetime.date(year, month, day)
+            start_of_year = datetime.date(year, 1, 1)
+            start_of_next_year = datetime.date(year + 1, 1, 1)
+            
+            # Calculate the total number of days between the start of the year and the given date
+            total_days = (date - start_of_year).days
+            
+            # Calculate the total number of weeks
+            total_weeks = (start_of_next_year - start_of_year).days // 7
+            
+            # Calculate the position of the week within the year
+            week_position = (total_days // 7) + 1
+            
+            return week_position
+        
+        def determine_interval_of_6(n):
+            if n <= 6:
+                return n
+            else:
+                return determine_interval_of_6(n-6)
+            
+        def determine_interval_of_4(n):
+            if n <= 4:
+                return n
+            else:
+                return determine_interval_of_4(n-4)
+        
+        def determine_interval_of_5(n):
+            if n <= 5:
+                return n
+            else:
+                return determine_interval_of_5(n-5)
+        
+        
+        
+        class Chore:
+            completed = False
+        
+            def __init__(self, name, description, due_date=" "):
+                self.name = name
+                self.description = description
+                self.due_date = due_date
+        
+            def __repr__(self):
+                return f"{self.name}: {self.description}"
+        
+        class Person:
+            # an instance of a chore chart must exist before creating a person
+            
+            def __init__(self, name, assigned_chore=None):
+                self.name = name
+                if assigned_chore is None:
+                    assigned_chore = []
+                self.assigned_chore = assigned_chore
+            def __repr__(self):
+                return self.name
+        
+        class ChoreChart:
+            chart_gui = []
+            
+            def __init__(self, chore_list=[], people=[], table=None):
+                self.chore_list = chore_list # this is a list of Chore instances
+                self.people = people
+                self.table = table
+        
+            def add_person(self, person):
+                #adds person to chore chart
+                self.people.append(person)
+                return self.people
+            
+            def add_chore(self, chore):
+                self.chore_list.append(chore)
+                return self.chore_list
+            
+            def remove_chore(self, chore):
+                self.chore_list.remove(chore)
+                return self.chore_list
+            
+            def assign_one_chore(self, person, chore):
+                person.assigned_chore.append(chore)
+        
+            def shift_chore_list(self, local_chore_list):# shift all chores in the list to the right
+                keep = local_chore_list.pop()
+                local_chore_list.insert(0, keep)
+                return local_chore_list
+            
+            def assign_all_chores_original(self, people, local_chore_list):    
+                x = 0
+                for person in people:
+                    if local_chore_list[x] != clean_bathroom:
+                        person.assigned_chore.append(local_chore_list[x])
+                        x += 1
+                    elif ((local_chore_list[x] == clean_bathroom) and (person == mark)):
+                        person.assigned_chore.append(clean_bbq)
+                        x += 1
+                    elif ((local_chore_list[x] == clean_bathroom) and (person == lydia)):
+                        person.assigned_chore.append(clean_bbq)
+                        x += 1
+                    else:
+                        person.assigned_chore.append(local_chore_list[x])
+                        x += 1
+                    
+        
+            
+            def assign_all_chores(self, people, local_chore_list, month, day_of_week, year):
+                week_number = get_week_number(year, month, day_of_week)
+                chore_interval_of_6 = determine_interval_of_6(week_number)
+                
+                for _ in range(chore_interval_of_6 - 1):
+                    self.shift_chore_list(local_chore_list)
+                
+                self.assign_all_chores_original(people, local_chore_list)
+        
+                
+                
+        
+            def create_table(self):
+                self.table = PrettyTable()
+                self.table.field_names = ["Person", "Chore", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"]
+                for person in self.people:
+                    self.table.add_row([person.name, person.assigned_chore[0], " ", " ", " ", " ", " ", " ", " "])
+        
+        
+                
+        #------------------creating the chore chart and the chores---------------------#    
+        chore_chart = ChoreChart()
+        mop_floor = Chore("Mop the floor", "Mop the kitchen floor using the bucket and mop found outside")
+        clean_bathroom = Chore("Clean the bathroom", "Clean the toilet, sink, and bathtub")
+        dust_living_room = Chore("Dust the living room", "Dust all surfaces in the living room")
+        dust_family_room = Chore("Dust the family room", "Dust all surfaces in the family room")
+        gather_trash = Chore("Gather trash", "Gather all trash within the house (kitchen, bathrooms, bedrooms)")
+        rest = Chore("Rest", "Rest this week!")
+        vacuum = Chore("Vacuum the floor", "Vacuum all carpets in the house")
+        pool_and_trash = Chore("Skim the pool and take out the trash", "Skim the pool using the net and gather trash from around the house")
+        clean_bbq = Chore("Clean BBQ", "Clean the barbeque")
+        
+        chore_list = [mop_floor, clean_bathroom, dust_living_room, dust_family_room, pool_and_trash, vacuum]
+        #------------------------------------------------------------------------------#
+        
+        
+        
+        #------------------------creating people instances-----------------------------#
+        caden = Person("Caden")
+        curtis = Person("Curtis")
+        lydia = Person("Lydia")
+        mark = Person("Mark")
+        mike = Person("Mike")
+        tyler = Person("Tyler")
+        
+        people = [lydia, curtis, caden, mark, mike, tyler]
+        #------------------------------------------------------------------------------#
+        
+        #-------------adding people to chore chart and creating the table--------------#
+        for person in people:
+            chore_chart.add_person(person)
+        
+        #---------------------------------------------------------------------#
+        current_date = datetime.date.today()
+        
+        current_year = current_date.year
+        current_month = current_date.month
+        current_day = current_date.day
+        
+        chore_chart.assign_all_chores(people, chore_list, current_month, current_day, current_year) #people, chore list, month, day, year
+        chore_chart.create_table() 
+        print(chore_chart.table)
+        
+        
+        #----------------------------------------------------------------------#
     </py-script>
 
   </body>
